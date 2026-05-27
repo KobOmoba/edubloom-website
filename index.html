@@ -14,17 +14,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  --brand:    #4f46e5;
-  --brand2:   #4338ca;
-  --accent:   #a78bfa;
-  --green:    #16a34a;
-  --bg:       #0e0c24;
-  --bg2:      #09081c;
-  --card:     #16143a;
-  --border:   #2d2060;
-  --text:     #f1f5f9;
-  --sub:      #64748b;
-  --sub2:     #94a3b8;
+  --brand:    #7b2d8b;   /* EduBloom purple — "Edu-" */
+  --brand2:   #6a1f7a;
+  --accent:   #f59e0b;   /* EduBloom amber — "BLOOM" */
+  --accent2:  #d97706;
+  --green:    #16a34a;   /* Plant/sprout green */
+  --brown:    #92400e;   /* Soil brown */
+  --bg:       #0f0a14;   /* Deep dark with purple tint */
+  --bg2:      #0a0810;
+  --card:     #1a1020;
+  --border:   #2e1a3a;
+  --text:     #f5f0e8;
+  --sub:      #7c6888;
+  --sub2:     #a896b8;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
@@ -52,14 +54,14 @@ nav {
 .nav-logo span { font-size: 1.4rem; }
 .nav-logo em { color: var(--accent); font-style: normal; }
 .nav-cta {
-  background: var(--brand); color: #fff;
+  background: var(--accent); color: #000;
   border: none; border-radius: 8px;
   padding: 0.5rem 1.1rem; font-size: 0.82rem; font-weight: 700;
   cursor: pointer; font-family: 'Inter', sans-serif;
   text-decoration: none; display: inline-block;
   transition: background 0.2s;
 }
-.nav-cta:hover { background: var(--brand2); }
+.nav-cta:hover { background: var(--accent2); color: #000; }
 
 /* ── HERO ── */
 .hero {
@@ -72,12 +74,12 @@ nav {
 .hero-glow {
   position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
   width: 600px; height: 400px;
-  background: radial-gradient(ellipse, #4f46e522 0%, transparent 70%);
+  background: radial-gradient(ellipse, #7b2d8b22 0%, transparent 70%);
   pointer-events: none;
 }
 .hero-badge {
   display: inline-block;
-  background: #2563eb22; border: 1px solid #7c3aed55;
+  background: #2563eb22; border: 1px solid #f59e0b55;
   border-radius: 20px; padding: 5px 14px;
   font-size: 0.74rem; font-weight: 600; color: var(--accent);
   margin-bottom: 1.2rem; letter-spacing: 0.5px;
@@ -102,7 +104,7 @@ nav {
   cursor: pointer; font-family: 'Inter', sans-serif;
   text-decoration: none; display: inline-block;
   transition: background 0.2s, transform 0.1s;
-  box-shadow: 0 4px 20px #4f46e544;
+  box-shadow: 0 4px 20px #7b2d8b44;
 }
 .btn-primary:hover { background: var(--brand2); transform: translateY(-1px); }
 .btn-ghost {
@@ -227,13 +229,13 @@ section { padding: 5rem 1.5rem; }
   padding: 2.5rem 2rem;
   max-width: 420px; margin: 0 auto;
   text-align: center;
-  box-shadow: 0 0 40px #7c3aed22;
+  box-shadow: 0 0 40px #f59e0b22;
   position: relative; overflow: hidden;
 }
 .pricing-card::before {
   content: 'MOST POPULAR';
   position: absolute; top: 16px; right: -28px;
-  background: var(--brand); color: #fff;
+  background: var(--accent); color: #000;
   font-size: 0.6rem; font-weight: 800;
   padding: 4px 40px; transform: rotate(45deg);
   letter-spacing: 1px;
@@ -256,7 +258,7 @@ section { padding: 5rem 1.5rem; }
 .pricing-features li:last-child { border-bottom: none; }
 .pricing-features li::before { content: '✅'; font-size: 0.8rem; flex-shrink: 0; margin-top: 1px; }
 .pricing-opaque {
-  background: #2563eb22; border: 1px solid #7c3aed55;
+  background: #2563eb22; border: 1px solid #f59e0b55;
   border-radius: 10px; padding: 0.8rem;
   font-size: 0.78rem; color: var(--accent);
   margin-bottom: 1.5rem; line-height: 1.5;
@@ -276,7 +278,7 @@ section { padding: 5rem 1.5rem; }
 /* ── CTA SECTION ── */
 .cta-section {
   text-align: center;
-  background: linear-gradient(135deg, #3730a322 0%, #2563eb11 100%);
+  background: linear-gradient(135deg, #5b1a6e22 0%, #2563eb11 100%);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -334,7 +336,7 @@ footer {
 <nav>
   <div class="nav-logo">
     <span>🎓</span>
-    Edu<em>Bloom</em>
+    <span style="color:var(--text)">Edu</span><em style="color:var(--accent)">Bloom</em>
   </div>
   <a class="nav-cta" href="https://wa.me/2348145073941?text=Hello%2C%20I%20want%20to%20know%20more%20about%20EduBloom" target="_blank">Get Started</a>
 </nav>
@@ -368,7 +370,7 @@ footer {
         <div class="mock-card"><div class="mock-num">₦210k</div><div class="mock-lbl">Term Fees</div></div>
       </div>
       <div style="margin:6px 0;">
-        <div class="mock-bar" style="width:100%;height:5px;border-radius:3px;background:#4f46e5;margin-bottom:3px;"></div>
+        <div class="mock-bar" style="width:100%;height:5px;border-radius:3px;background:#7b2d8b;margin-bottom:3px;"></div>
         <div class="mock-bar short"></div>
       </div>
       <div class="mock-row">
@@ -591,7 +593,7 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Edu<em>Bloom</em></div>
+  <div class="footer-logo"><span style="color:var(--text)">Edu</span><em style="color:var(--accent)">Bloom</em></div>
   <div class="footer-tagline">Smart School Management · Built for Nigeria</div>
   <div class="footer-links">
     <a href="#features">Features</a>
