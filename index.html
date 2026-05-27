@@ -50,7 +50,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ── NAV ── */
 nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  position: sticky; top: 0; left: 0; right: 0; z-index: 100;
   background: #0f172aee;
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
@@ -76,7 +76,7 @@ nav {
   min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center;
-  padding: 6rem 1.5rem 4rem;
+  padding: 3rem 1.5rem 4rem;
   position: relative; overflow: hidden;
 }
 .hero-glow {
@@ -336,6 +336,7 @@ footer {
   .phone-mock.side { display: none; }
   .pricing-card::before { display: none; }
 }
+body { background: #130d1c !important; }
 </style>
 </head>
 <body>
