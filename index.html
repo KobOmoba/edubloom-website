@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduBloom — Smart School Management for Nigerian Schools</title>
+<meta name="description" content="EduBloom helps Nigerian schools manage fees, attendance, report cards, staff and expenses — all in one app that works even offline.">
+<meta property="og:title" content="EduBloom — Smart School Management">
+<meta property="og:description" content="Everything your school needs. One flat subscription. Built for Nigeria.">
+<meta property="og:image" content="https://kobomoba.github.io/edubloom-website/og-image.png">
+<meta property="og:url" content="https://edubloom.com.ng">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --brand:    #2563eb;
+  --brand2:   #1d4ed8;
+  --accent:   #60a5fa;
+  --green:    #16a34a;
+  --bg:       #0f172a;
+  --bg2:      #0a1628;
+  --card:     #1e293b;
+  --border:   #1e3a5f;
+  --text:     #f1f5f9;
+  --sub:      #64748b;
+  --sub2:     #94a3b8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: #0f172aee;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.1rem; }
+.nav-logo span { font-size: 1.4rem; }
+.nav-logo em { color: var(--accent); font-style: normal; }
+.nav-cta {
+  background: var(--brand); color: #fff;
+  border: none; border-radius: 8px;
+  padding: 0.5rem 1.1rem; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  text-decoration: none; display: inline-block;
+  transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--brand2); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 6rem 1.5rem 4rem;
+  position: relative; overflow: hidden;
+}
+.hero-glow {
+  position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, #2563eb22 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-block;
+  background: #2563eb22; border: 1px solid #2563eb55;
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 0.74rem; font-weight: 600; color: var(--accent);
+  margin-bottom: 1.2rem; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 900; line-height: 1.1;
+  max-width: 700px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-sub {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  color: var(--sub2); max-width: 520px;
+  margin: 1.2rem auto 2rem; line-height: 1.7;
+}
+.hero-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.btn-primary {
+  background: var(--brand); color: #fff;
+  border: none; border-radius: 10px;
+  padding: 0.85rem 1.8rem; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  text-decoration: none; display: inline-block;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 20px #2563eb44;
+}
+.btn-primary:hover { background: var(--brand2); transform: translateY(-1px); }
+.btn-ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.85rem 1.8rem; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  text-decoration: none; display: inline-block;
+  transition: border-color 0.2s;
+}
+.btn-ghost:hover { border-color: var(--brand); color: var(--accent); }
+
+.hero-phones {
+  margin-top: 3rem;
+  display: flex; gap: 1rem; justify-content: center; align-items: flex-end;
+  flex-wrap: wrap;
+}
+.phone-mock {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.8rem;
+  width: 160px;
+  box-shadow: 0 20px 60px #00000066;
+}
+.phone-mock.main { width: 180px; margin-bottom: 0; }
+.phone-mock.side { width: 150px; margin-bottom: 1rem; opacity: 0.7; }
+.mock-bar {
+  background: var(--brand); border-radius: 6px; height: 8px; margin-bottom: 6px;
+}
+.mock-bar.short { width: 60%; background: #1e3a5f; }
+.mock-bar.med { width: 80%; background: #1e3a5f; }
+.mock-row { display: flex; gap: 4px; margin-bottom: 4px; }
+.mock-card { background: #0f172a; border-radius: 6px; padding: 5px; flex: 1; }
+.mock-num { font-size: 0.6rem; font-weight: 700; color: var(--accent); }
+.mock-lbl { font-size: 0.45rem; color: var(--sub); }
+
+/* ── SECTION BASE ── */
+section { padding: 5rem 1.5rem; }
+.container { max-width: 900px; margin: 0 auto; }
+.sec-label {
+  font-size: 0.72rem; font-weight: 700; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  text-align: center; margin-bottom: 0.6rem;
+}
+.sec-title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 800; text-align: center; line-height: 1.2;
+  margin-bottom: 0.6rem;
+}
+.sec-sub {
+  text-align: center; color: var(--sub2); font-size: 0.92rem;
+  max-width: 520px; margin: 0 auto 3rem; line-height: 1.6;
+}
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+}
+.stats-grid {
+  max-width: 700px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1rem; text-align: center;
+}
+.stat-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); }
+.stat-lbl { font-size: 0.75rem; color: var(--sub2); margin-top: 2px; }
+
+/* ── FEATURES ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+.feat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.4rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feat-card:hover { border-color: var(--brand); transform: translateY(-3px); }
+.feat-icon { font-size: 2rem; margin-bottom: 0.7rem; display: block; }
+.feat-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.35rem; }
+.feat-desc { font-size: 0.8rem; color: var(--sub2); line-height: 1.6; }
+
+/* ── HOW IT WORKS ── */
+.how-bg { background: var(--bg2); }
+.steps { display: flex; flex-direction: column; gap: 1rem; max-width: 600px; margin: 0 auto; }
+.step {
+  display: flex; gap: 1rem; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.2rem;
+}
+.step-num {
+  background: var(--brand); color: #fff;
+  border-radius: 50%; width: 32px; height: 32px; min-width: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem; margin-top: 2px;
+}
+.step-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.25rem; }
+.step-desc { font-size: 0.78rem; color: var(--sub2); line-height: 1.5; }
+
+/* ── WHO IS IT FOR ── */
+.personas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.persona {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.4rem; text-align: center;
+}
+.persona-icon { font-size: 2.5rem; margin-bottom: 0.7rem; display: block; }
+.persona-title { font-weight: 700; margin-bottom: 0.4rem; }
+.persona-desc { font-size: 0.78rem; color: var(--sub2); line-height: 1.6; }
+
+/* ── PRICING ── */
+.pricing-bg { background: var(--bg2); }
+.pricing-card {
+  background: var(--card);
+  border: 2px solid var(--brand);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  max-width: 420px; margin: 0 auto;
+  text-align: center;
+  box-shadow: 0 0 40px #2563eb22;
+  position: relative; overflow: hidden;
+}
+.pricing-card::before {
+  content: 'MOST POPULAR';
+  position: absolute; top: 16px; right: -28px;
+  background: var(--brand); color: #fff;
+  font-size: 0.6rem; font-weight: 800;
+  padding: 4px 40px; transform: rotate(45deg);
+  letter-spacing: 1px;
+}
+.pricing-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+.pricing-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+.pricing-amount {
+  font-size: 3rem; font-weight: 900; color: var(--accent);
+  line-height: 1; margin: 0.5rem 0;
+}
+.pricing-amount sup { font-size: 1.2rem; vertical-align: super; }
+.pricing-amount sub { font-size: 0.9rem; color: var(--sub2); font-weight: 400; }
+.pricing-note { font-size: 0.78rem; color: var(--sub2); margin-bottom: 1.5rem; }
+.pricing-features { list-style: none; margin-bottom: 2rem; text-align: left; }
+.pricing-features li {
+  padding: 0.4rem 0; font-size: 0.83rem;
+  border-bottom: 1px solid #1e293b;
+  display: flex; gap: 0.5rem;
+}
+.pricing-features li:last-child { border-bottom: none; }
+.pricing-features li::before { content: '✅'; font-size: 0.8rem; flex-shrink: 0; margin-top: 1px; }
+.pricing-opaque {
+  background: #2563eb22; border: 1px solid #2563eb55;
+  border-radius: 10px; padding: 0.8rem;
+  font-size: 0.78rem; color: var(--accent);
+  margin-bottom: 1.5rem; line-height: 1.5;
+}
+
+/* ── TESTIMONIAL (placeholder) ── */
+.testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+.testi {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.3rem;
+}
+.testi-text { font-size: 0.83rem; color: var(--sub2); line-height: 1.7; margin-bottom: 0.8rem; font-style: italic; }
+.testi-author { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+.testi-school { font-size: 0.72rem; color: var(--sub); }
+.stars { color: #f59e0b; font-size: 0.75rem; margin-bottom: 0.5rem; }
+
+/* ── CTA SECTION ── */
+.cta-section {
+  text-align: center;
+  background: linear-gradient(135deg, #1e3a8a22 0%, #2563eb11 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.cta-section h2 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; margin-bottom: 0.6rem; }
+.cta-section p { color: var(--sub2); font-size: 0.9rem; margin-bottom: 2rem; }
+.wa-button {
+  display: inline-flex; align-items: center; gap: 0.7rem;
+  background: #15803d; color: #fff;
+  border-radius: 12px; padding: 1rem 2rem;
+  font-size: 1rem; font-weight: 800;
+  transition: background 0.2s, transform 0.1s;
+  text-decoration: none;
+  box-shadow: 0 4px 20px #16a34a44;
+}
+.wa-button:hover { background: #166534; transform: translateY(-2px); }
+.wa-button span { font-size: 1.4rem; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+.footer-logo { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem; }
+.footer-logo em { color: var(--accent); font-style: normal; }
+.footer-tagline { font-size: 0.78rem; color: var(--sub); margin-bottom: 1.2rem; }
+.footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.footer-links a { font-size: 0.78rem; color: var(--sub2); transition: color 0.2s; }
+.footer-links a:hover { color: var(--accent); }
+.footer-copy { font-size: 0.7rem; color: var(--sub); }
+
+/* ── FLOATING WA ── */
+.float-wa {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 99;
+  background: #15803d; color: #fff;
+  border-radius: 50%; width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; box-shadow: 0 4px 20px #16a34a66;
+  text-decoration: none; transition: transform 0.2s;
+}
+.float-wa:hover { transform: scale(1.1); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 1.9rem; }
+  .phone-mock.side { display: none; }
+  .pricing-card::before { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span>🎓</span>
+    Edu<em>Bloom</em>
+  </div>
+  <a class="nav-cta" href="https://wa.me/2348145073941?text=Hello%2C%20I%20want%20to%20know%20more%20about%20EduBloom" target="_blank">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">🇳🇬 Built for Nigerian Schools</div>
+  <h1>Run Your School <em>Smarter</em></h1>
+  <p class="hero-sub">Fees, attendance, report cards, staff, expenses — everything your school needs in one app. Works even without internet.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="https://wa.me/2348145073941?text=Hello%20Bayo%2C%20I%20want%20to%20get%20EduBloom%20for%20my%20school" target="_blank">💬 Talk to Us on WhatsApp</a>
+    <a class="btn-ghost" href="#features">See Features ↓</a>
+  </div>
+
+  <!-- Phone Mockups -->
+  <div class="hero-phones">
+    <div class="phone-mock side">
+      <div class="mock-bar" style="width:100%;height:6px;margin-bottom:8px;"></div>
+      <div class="mock-row">
+        <div class="mock-card"><div class="mock-num">₦84k</div><div class="mock-lbl">Fees Collected</div></div>
+        <div class="mock-card"><div class="mock-num">47</div><div class="mock-lbl">Students</div></div>
+      </div>
+      <div class="mock-bar short"></div>
+      <div class="mock-bar med"></div>
+    </div>
+    <div class="phone-mock main">
+      <div class="mock-bar" style="width:100%;height:8px;margin-bottom:10px;"></div>
+      <div class="mock-row">
+        <div class="mock-card"><div class="mock-num">120</div><div class="mock-lbl">Students</div></div>
+        <div class="mock-card"><div class="mock-num">₦210k</div><div class="mock-lbl">Term Fees</div></div>
+      </div>
+      <div style="margin:6px 0;">
+        <div class="mock-bar" style="width:100%;height:5px;border-radius:3px;background:#2563eb;margin-bottom:3px;"></div>
+        <div class="mock-bar short"></div>
+      </div>
+      <div class="mock-row">
+        <div class="mock-card"><div class="mock-num">8</div><div class="mock-lbl">Staff</div></div>
+        <div class="mock-card"><div class="mock-num">98%</div><div class="mock-lbl">Attendance</div></div>
+      </div>
+      <div style="margin-top:6px;">
+        <div class="mock-bar med"></div>
+        <div class="mock-bar short"></div>
+      </div>
+    </div>
+    <div class="phone-mock side">
+      <div class="mock-bar" style="width:100%;height:6px;margin-bottom:8px;"></div>
+      <div class="mock-row">
+        <div class="mock-card"><div class="mock-num">SS2</div><div class="mock-lbl">Report Card</div></div>
+        <div class="mock-card"><div class="mock-num">A1</div><div class="mock-lbl">Top Grade</div></div>
+      </div>
+      <div class="mock-bar short"></div>
+      <div class="mock-bar med"></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-grid">
+    <div><div class="stat-val">100%</div><div class="stat-lbl">Works Offline</div></div>
+    <div><div class="stat-val">6+</div><div class="stat-lbl">Core Modules</div></div>
+    <div><div class="stat-val">Any</div><div class="stat-lbl">Phone or Tablet</div></div>
+    <div><div class="stat-val">1 App</div><div class="stat-lbl">Everything Included</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="sec-label">Features</div>
+    <h2 class="sec-title">Everything Your School Needs</h2>
+    <p class="sec-sub">No more notebooks. No more spreadsheets. No more confusion at end of term.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <span class="feat-icon">💰</span>
+        <div class="feat-title">Fee Tracking</div>
+        <div class="feat-desc">Know exactly who has paid, who is owing, and how much has been collected this term — at a glance.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📋</span>
+        <div class="feat-title">Daily Attendance</div>
+        <div class="feat-desc">Mark Present, Absent or Late for every student in under 2 minutes. Automatic monthly summary.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📝</span>
+        <div class="feat-title">Scores & Report Cards</div>
+        <div class="feat-desc">Enter CA and exam scores. Grades, positions and report cards are generated automatically — print-ready.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">👥</span>
+        <div class="feat-title">Staff Management</div>
+        <div class="feat-desc">Manage all your teachers and support staff — roles, subjects, contact details — in one place.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📉</span>
+        <div class="feat-title">Expense Control</div>
+        <div class="feat-desc">Log every school expense by category. See where your money is going before it disappears.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📱</span>
+        <div class="feat-title">Works Offline</div>
+        <div class="feat-desc">No internet at school? No problem. EduBloom works fully offline and syncs automatically when you reconnect.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔐</span>
+        <div class="feat-title">Secure Login</div>
+        <div class="feat-desc">Each school has its own private login. Your school data belongs to you — nobody else can see it.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📲</span>
+        <div class="feat-title">Install on Any Phone</div>
+        <div class="feat-desc">No app store needed. Add EduBloom to your home screen like a native app — on Android or iPhone.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-bg">
+  <div class="container">
+    <div class="sec-label">How It Works</div>
+    <h2 class="sec-title">Up and Running in Minutes</h2>
+    <p class="sec-sub">No IT department. No training. Just a phone and a WhatsApp message.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Contact us on WhatsApp</div>
+          <div class="step-desc">Send us a message with your school name and location. We set up your account within 24 hours.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Receive your School ID & Password</div>
+          <div class="step-desc">We send you a unique School ID and login password. Open the app on any browser — no installation needed.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Add your students</div>
+          <div class="step-desc">Add students one by one or import an entire class at once. Takes less than 10 minutes for most schools.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Start managing your school</div>
+          <div class="step-desc">Record fees, take attendance, enter scores, manage staff and track expenses — all from your phone.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IS IT FOR -->
+<section>
+  <div class="container">
+    <div class="sec-label">Who It's For</div>
+    <h2 class="sec-title">Made for Every School in Nigeria</h2>
+    <p class="sec-sub">Private or public. Primary or secondary. Big city or small town.</p>
+    <div class="personas">
+      <div class="persona">
+        <span class="persona-icon">🏫</span>
+        <div class="persona-title">Proprietors & Proprietresses</div>
+        <div class="persona-desc">Full visibility of your school's finances, staff and students — without depending on anyone to give you a report.</div>
+      </div>
+      <div class="persona">
+        <span class="persona-icon">👨‍💼</span>
+        <div class="persona-title">Principals & Head Teachers</div>
+        <div class="persona-desc">Manage daily operations — attendance, scores, report cards — from one simple dashboard on your phone.</div>
+      </div>
+      <div class="persona">
+        <span class="persona-icon">💼</span>
+        <div class="persona-title">Bursars & Accountants</div>
+        <div class="persona-desc">Track every fee payment, receipt and expense. No more disputes about who paid and who didn't.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-bg">
+  <div class="container">
+    <div class="sec-label">Pricing</div>
+    <h2 class="sec-title">Simple. Transparent. Affordable.</h2>
+    <p class="sec-sub">One subscription. Everything included. No hidden fees.</p>
+    <div class="pricing-card">
+      <span class="pricing-icon">🎓</span>
+      <div class="pricing-name">Annual Subscription</div>
+      <div class="pricing-amount"><sup>Contact Us</sup></div>
+      <div class="pricing-note">One flat annual fee — contact us for current pricing</div>
+      <div class="pricing-opaque">
+        💡 Your school sets its own technology fee for parents.<br>
+        Most schools recover the full cost from parents in the first term.
+      </div>
+      <ul class="pricing-features">
+        <li>Unlimited students</li>
+        <li>All 6 modules included</li>
+        <li>Offline access — always</li>
+        <li>Automatic data backup</li>
+        <li>Report cards & broadsheets</li>
+        <li>WhatsApp support included</li>
+        <li>Works on any phone or tablet</li>
+        <li>No setup fees</li>
+      </ul>
+      <a class="btn-primary" style="display:block;text-align:center;" href="https://wa.me/2348145073941?text=Hello%20Bayo%2C%20I%20want%20to%20subscribe%20to%20EduBloom%20for%20my%20school" target="_blank">💬 Get Pricing on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="container">
+    <div class="sec-label">Early Feedback</div>
+    <h2 class="sec-title">What School Owners Are Saying</h2>
+    <p class="sec-sub">We are just getting started — but the response has been encouraging.</p>
+    <div class="testimonials">
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <div class="testi-text">"Finally something built for how we actually run schools in Nigeria. Not some foreign software that doesn't understand our system."</div>
+        <div class="testi-author">School Proprietor</div>
+        <div class="testi-school">Private Secondary School, Ogun State</div>
+      </div>
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <div class="testi-text">"The offline feature alone is worth it. Our school does not have stable internet but the app still works perfectly."</div>
+        <div class="testi-author">School Principal</div>
+        <div class="testi-school">Private Primary School, Lagos</div>
+      </div>
+      <div class="testi">
+        <div class="stars">★★★★★</div>
+        <div class="testi-text">"Report cards used to take us 3 days. Now everything is generated automatically. I showed the parents and they were very impressed."</div>
+        <div class="testi-author">Head Teacher</div>
+        <div class="testi-school">Community School, Abeokuta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to Modernise Your School?</h2>
+    <p>Join Nigerian schools already running smarter with EduBloom. Contact us today — we'll have you up and running within 24 hours.</p>
+    <a class="wa-button" href="https://wa.me/2348145073941?text=Hello%20Bayo%2C%20I%20am%20ready%20to%20get%20EduBloom%20for%20my%20school.%20Please%20tell%20me%20more." target="_blank">
+      <span>💬</span> Chat With Us on WhatsApp
+    </a>
+    <p style="margin-top:1rem;font-size:0.75rem;color:var(--sub);">0814 507 3941 · edubloom.com.ng</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Edu<em>Bloom</em></div>
+  <div class="footer-tagline">Smart School Management · Built for Nigeria</div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="https://wa.me/2348145073941" target="_blank">Contact</a>
+    <a href="https://kobomoba.github.io/School-Bloom" target="_blank">Login</a>
+  </div>
+  <div class="footer-copy">© 2026 AariNAT Company Limited · Abeokuta, Nigeria · All rights reserved</div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a class="float-wa" href="https://wa.me/2348145073941?text=Hello%2C%20I%20want%20to%20know%20more%20about%20EduBloom" target="_blank" title="Chat on WhatsApp">💬</a>
+
+</body>
+</html>
