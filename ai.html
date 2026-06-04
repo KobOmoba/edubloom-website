@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#4B0082">
+<title>EduBloom AI Agent Suite — AariNAT</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #F9F6FF; font-family: Georgia, serif; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: #EDE8F5; border-radius: 4px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none} }
+  .fade-in { animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+// ── Brand colours ──────────────────────────────────────────────────────────────
+const C = {
+  purple:"#4B0082",purpleMid:"#6E1F8B",purpleLight:"#EDE8F5",
+  gold:"#C9A84C",goldLight:"#F5E6B8",goldDark:"#7A5C1E",
+  orange:"#D4710F",white:"#FFFFFF",dark:"#1A1A1A",mid:"#555555",
+  green:"#15803D",red:"#DC2626",bg:"#F9F6FF"
+};
+
+// ── Anthropic API call ─────────────────────────────────────────────────────────
+async function callClaude(system, messages) {
+  const key = localStorage.getItem('edubloom_ai_key');
+  if (!key) throw new Error('NO_KEY');
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-ipc": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system,
+      messages
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'API error');
+  return data.content?.map(b => b.text || "").join("") || "";
+}
+
+// ── Shared components ──────────────────────────────────────────────────────────
+const Btn = ({children,onClick,disabled,color=C.purple,small=false,outline=false,full=false}) => (
+  <button onClick={onClick} disabled={disabled} style={{
+    background:outline?"transparent":disabled?"#CCC":color,
+    color:outline?color:C.white,
+    border:outline?`2px solid ${color}`:"none",
+    borderRadius:8,
+    padding:small?"6px 14px":"10px 20px",
+    fontSize:small?12:14,
+    fontWeight:"bold",
+    cursor:disabled?"not-allowed":"pointer",
+    fontFamily:"Georgia,serif",
+    opacity:disabled?0.6:1,
+    width:full?"100%":"auto",
+    transition:"opacity 0.2s"
+  }}>{children}</button>
+);
+
+const Label = ({children}) => (
+  <div style={{fontSize:10,fontWeight:"bold",color:C.goldDark,
+    textTransform:"uppercase",letterSpacing:1.5,marginBottom:6}}>{children}</div>
+);
+
+const Inp = ({value,onChange,placeholder,multiline=false,rows=2,type="text"}) => {
+  const s = {width:"100%",border:`1px solid #C9A8E0`,borderRadius:8,
+    padding:"9px 11px",fontSize:13,fontFamily:"Georgia,serif",
+    color:C.dark,outline:"none",background:"#FDFAFF",resize:multiline?"vertical":"none"};
+  return multiline
+    ? <textarea value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={s}/>
+    : <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={s}/>;
+};
+
+const Spinner = () => (
+  <div style={{display:"inline-block",width:16,height:16,
+    border:`2px solid #E5D5F0`,borderTopColor:C.purple,
+    borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+);
+
+const AgentHeader = ({emoji,title,sub,gradient}) => (
+  <div style={{background:gradient,padding:"12px 16px",borderRadius:"10px 10px 0 0",
+    display:"flex",alignItems:"center",gap:10}}>
+    <div style={{fontSize:22}}>{emoji}</div>
+    <div>
+      <div style={{color:C.white,fontWeight:"bold",fontSize:14}}>{title}</div>
+      <div style={{color:"rgba(255,255,255,0.75)",fontSize:11}}>{sub}</div>
+    </div>
+  </div>
+);
+
+// ── API Key Setup ──────────────────────────────────────────────────────────────
+function ApiKeySetup({onSave}) {
+  const [key, setKey] = useState('');
+  const [err, setErr] = useState('');
+  const [testing, setTesting] = useState(false);
+
+  async function saveKey() {
+    const k = key.trim();
+    if (!k.startsWith('sk-ant-')) { setErr('Key should start with sk-ant-'); return; }
+    setTesting(true); setErr('');
+    try {
+      await callClaude('Say OK in one word', [{ role:'user', content:'Test' }]);
+      localStorage.setItem('edubloom_ai_key', k);
+      onSave();
+    } catch(e) {
+      // Try saving anyway even if test fails (CORS might block test)
+      localStorage.setItem('edubloom_ai_key', k);
+      onSave();
+    }
+    setTesting(false);
+  }
+
+  return (
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",
+      padding:24,background:"linear-gradient(160deg,#4B0082,#6E1F8B)"}}>
+      <div style={{background:C.white,borderRadius:16,padding:28,width:"100%",maxWidth:420,
+        boxShadow:"0 8px 40px rgba(75,0,130,0.25)"}}>
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{fontSize:36,marginBottom:8}}>🌸</div>
+          <div style={{fontSize:22,fontWeight:"bold",color:C.purple}}>
+            Edu<span style={{color:C.gold}}>BLOOM</span>
+          </div>
+          <div style={{fontSize:13,color:C.mid,marginTop:4}}>AI Agent Suite — AariNAT Company Limited</div>
+        </div>
+
+        <div style={{background:"#F9F6FF",borderRadius:10,padding:16,marginBottom:18,
+          border:`1px solid ${C.purpleLight}`}}>
+          <div style={{fontWeight:"bold",fontSize:13,color:C.dark,marginBottom:6}}>
+            First-time setup
+          </div>
+          <div style={{fontSize:12,color:C.mid,lineHeight:1.6}}>
+            Enter your Anthropic API key to power the four AI agents.<br/>
+            Your key is stored only on this device.
+          </div>
+        </div>
+
+        <Label>Anthropic API Key</Label>
+        <Inp type="password" value={key} onChange={setKey}
+          placeholder="sk-ant-api03-…"/>
+
+        {err && <div style={{color:C.red,fontSize:12,marginTop:6}}>{err}</div>}
+
+        <div style={{marginTop:14}}>
+          <Btn onClick={saveKey} disabled={!key.trim()||testing} color={C.purple} full>
+            {testing ? "Verifying…" : "🚀 Activate AI Agents"}
+          </Btn>
+        </div>
+
+        <div style={{marginTop:14,fontSize:11,color:C.mid,textAlign:"center",lineHeight:1.7}}>
+          Get your key at <strong>console.anthropic.com</strong><br/>
+          Questions? +234 814 507 3941
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AGENT 1: SCHOOL ONBOARDING
+// ══════════════════════════════════════════════════════════════════════════════
+function OnboardingAgent() {
+  const [messages, setMessages] = useState([{
+    role:"assistant",
+    text:"Good day! I'm the EduBloom Onboarding Assistant. 🌸\n\nI can help your school get set up on EduBloom in under 5 minutes — fees, attendance, report cards, safety alerts, and more.\n\nMay I start by asking: what is the name of your school?"
+  }]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef();
+  useEffect(()=>{bottomRef.current?.scrollIntoView({behavior:"smooth"})},[messages]);
+
+  const SYSTEM = `You are the EduBloom School Onboarding AI Assistant for AariNAT Company Limited, Nigeria.
+
+EduBloom is a school management app for Nigerian private schools. Features: fee tracking, attendance, report cards (auto-generated), staff management with role-based access, BloomCollect payments, offline mode, and Premium safety features (absence alerts, authorised collector verification, mid-day sign-out confirmation).
+
+Pricing (per term):
+- 1–50 students: ₦10,000 Basic / ₦15,000 Premium
+- 51–100 students: ₦20,000 Basic / ₦30,000 Premium
+- 101–200 students: ₦35,000 Basic / ₦52,500 Premium
+- 201–350 students: ₦55,000 Basic / ₦82,500 Premium
+- 351+ students: ₦75,000 Basic / ₦112,500 Premium
+
+Premium includes: unlimited staff logins, BloomCollect online fee collection, all 3 child safety features, parent WhatsApp automation.
+30 days FREE trial — no payment required to start.
+
+Your job: Guide the school head through onboarding in a warm, professional, conversational way.
+Collect in this order: 1) School name 2) Approximate student count 3) Contact person name 4) WhatsApp number 5) LGA/State 6) Recommend Basic or Premium 7) Confirm interest — tell them Bayo (+234 814 507 3941) will call within 24 hours to complete setup.
+
+Keep responses SHORT (3–5 lines max). Be warm and Nigerian-aware. End each reply with a clear question.`;
+
+  async function send() {
+    if (!input.trim() || loading) return;
+    const userMsg = input.trim(); setInput('');
+    const next = [...messages,{role:"user",text:userMsg}];
+    setMessages(next); setLoading(true);
+    try {
+      const history = next.map(m=>({role:m.role==="assistant"?"assistant":"user",content:m.text}));
+      const reply = await callClaude(SYSTEM, history);
+      setMessages(p=>[...p,{role:"assistant",text:reply}]);
+    } catch(e) {
+      setMessages(p=>[...p,{role:"assistant",text:"Sorry, I encountered an error. Please check your API key in Settings."}]);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
+      <AgentHeader emoji="🏫" title="School Onboarding Agent"
+        sub="Guides new schools through EduBloom signup"
+        gradient={`linear-gradient(135deg,${C.purple},${C.purpleMid})`}/>
+
+      <div style={{flex:1,overflowY:"auto",padding:16,background:"#F9F6FF",
+        display:"flex",flexDirection:"column",gap:10,minHeight:340,maxHeight:420}}>
+        {messages.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start"}}
+            className="fade-in">
+            <div style={{maxWidth:"80%",padding:"10px 14px",
+              borderRadius:m.role==="user"?"16px 4px 16px 16px":"4px 16px 16px 16px",
+              background:m.role==="user"?C.purple:C.white,
+              color:m.role==="user"?C.white:C.dark,
+              fontSize:13,lineHeight:1.65,fontFamily:"Georgia,serif",
+              boxShadow:"0 1px 4px rgba(0,0,0,0.07)",
+              border:m.role!=="user"?`1px solid #E0D5F0`:"none",
+              whiteSpace:"pre-wrap"}}>{m.text}</div>
+          </div>
+        ))}
+        {loading && (
+          <div style={{display:"flex",justifyContent:"flex-start"}}>
+            <div style={{background:C.white,padding:"12px 16px",borderRadius:"4px 16px 16px 16px",
+              border:`1px solid #E0D5F0`,display:"flex",gap:5,alignItems:"center"}}>
+              {[0,1,2].map(i=>(
+                <div key={i} style={{width:7,height:7,borderRadius:"50%",background:C.purple,
+                  opacity:0.5,animation:`bounce 1s ease-in-out ${i*0.2}s infinite`}}/>
+              ))}
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef}/>
+      </div>
+
+      <div style={{padding:"10px 12px",background:C.white,borderTop:`1px solid #E0D5F0`,
+        borderRadius:"0 0 10px 10px",display:"flex",gap:8}}>
+        <input value={input} onChange={e=>setInput(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&send()}
+          placeholder="Type your reply…"
+          style={{flex:1,border:`1px solid #C9A8E0`,borderRadius:8,
+            padding:"9px 12px",fontSize:13,fontFamily:"Georgia,serif",outline:"none"}}/>
+        <Btn onClick={send} disabled={loading||!input.trim()} small>Send</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AGENT 2: FINANCE AI ADVISOR
+// ══════════════════════════════════════════════════════════════════════════════
+function FinanceAdvisor() {
+  const [data, setData] = useState({
+    name:"Bright Future Academy",students:"87",
+    termFees:"1500000",collected:"1043000",
+    outstanding:"457000",debtors:"23",
+    expenses:"380000",prevTermCollected:"1180000"
+  });
+  const [analysis, setAnalysis] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fmt = v => { const n=parseInt((v||'0').replace(/[^0-9]/g,'')); return '₦'+n.toLocaleString('en-NG'); };
+  const collRate = data.collected&&data.termFees
+    ? Math.round((parseInt(data.collected)/parseInt(data.termFees))*100) : 0;
+  const netPos = (parseInt(data.collected||0)-parseInt(data.expenses||0));
+
+  async function analyze() {
+    setLoading(true); setAnalysis('');
+    const SYSTEM = `You are the EduBloom Finance AI Advisor for Nigerian private schools. Analyze financial data and give clear, actionable insights. Use exact numbers. Identify risks. Format with: 📊 Summary, ⚠️ Risks, ✅ Three Prioritized Recommendations. Be specific and Nigerian-context aware. Keep total response under 300 words.`;
+    const prompt = `Analyze this school's financial data:
+
+School: ${data.name}
+Total students: ${data.students}
+Expected term fees: ${fmt(data.termFees)}
+Fees collected so far: ${fmt(data.collected)}
+Outstanding fees: ${fmt(data.outstanding)}
+Number of debtors: ${data.debtors} students
+Total expenses this term: ${fmt(data.expenses)}
+Last term collected: ${fmt(data.prevTermCollected)}
+Collection rate: ${collRate}%
+Net position (collected minus expenses): ${fmt(String(netPos))}`;
+    try {
+      const reply = await callClaude(SYSTEM,[{role:"user",content:prompt}]);
+      setAnalysis(reply);
+    } catch(e) { setAnalysis('Error: '+e.message); }
+    setLoading(false);
+  }
+
+  const fields = [
+    {k:"name",l:"School Name"},{k:"students",l:"Total Students"},
+    {k:"termFees",l:"Expected Term Fees (₦)"},{k:"collected",l:"Fees Collected (₦)"},
+    {k:"outstanding",l:"Outstanding (₦)"},{k:"debtors",l:"Number of Debtors"},
+    {k:"expenses",l:"Total Expenses (₦)"},{k:"prevTermCollected",l:"Last Term Collected (₦)"}
+  ];
+
+  return (
+    <div>
+      <AgentHeader emoji="📊" title="Finance AI Advisor"
+        sub="Real-time financial health analysis"
+        gradient={`linear-gradient(135deg,${C.goldDark},${C.gold})`}/>
+
+      <div style={{padding:16,background:"#FFFBEE",borderRadius:"0 0 10px 10px",
+        border:`1px solid ${C.gold}33`,borderTop:"none"}}>
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}}>
+          {[
+            {l:"Collection Rate",v:`${collRate}%`,c:collRate>=80?C.green:collRate>=60?C.gold:C.red},
+            {l:"Outstanding",v:fmt(data.outstanding),c:C.red},
+            {l:"Net Position",v:fmt(String(netPos)),c:netPos>=0?C.green:C.red},
+          ].map(m=>(
+            <div key={m.l} style={{background:C.white,borderRadius:8,padding:"10px 8px",
+              border:`1px solid #E0D5F0`,textAlign:"center"}}>
+              <div style={{fontSize:9,color:C.mid,textTransform:"uppercase",letterSpacing:1,marginBottom:4}}>{m.l}</div>
+              <div style={{fontSize:16,fontWeight:"bold",color:m.c}}>{m.v}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+          {fields.map(f=>(
+            <div key={f.k}>
+              <Label>{f.l}</Label>
+              <Inp value={data[f.k]} onChange={v=>setData(p=>({...p,[f.k]:v}))} placeholder={f.l}/>
+            </div>
+          ))}
+        </div>
+
+        <Btn onClick={analyze} disabled={loading} color={C.goldDark}>
+          {loading ? "Analysing…" : "🔍 Run Financial Analysis"}
+        </Btn>
+
+        {(loading||analysis) && (
+          <div style={{marginTop:14,background:C.white,borderRadius:8,padding:14,
+            border:`1px solid ${C.gold}66`,fontSize:13,lineHeight:1.75,
+            color:C.dark,fontFamily:"Georgia,serif",whiteSpace:"pre-wrap"}} className="fade-in">
+            {loading ? <div style={{display:"flex",gap:8,alignItems:"center",color:C.mid}}>
+              <Spinner/>  Analysing your school's finances…
+            </div> : analysis}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AGENT 3: REPORT CARD NARRATIVE GENERATOR
+// ══════════════════════════════════════════════════════════════════════════════
+function ReportCardAgent() {
+  const [student, setStudent] = useState({
+    name:"Adaobi Chukwu",class:"JSS 2",term:"First Term",attendance:"88",
+    subjects:"English: 72, Maths: 58, Science: 81, Social Studies: 65, CRS: 90, Yoruba: 74, PHE: 85"
+  });
+  const [comment, setComment] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [bulk, setBulk] = useState(false);
+  const [bulkResults, setBulkResults] = useState([]);
+
+  const SYSTEM = `You are the EduBloom Report Card Comment Generator for Nigerian private schools.
+Generate professional, encouraging, and specific end-of-term teacher comments based on student performance.
+The comment must: reference specific subjects by name, acknowledge strengths clearly, gently note areas for improvement, mention attendance if below 85%, and end with encouragement.
+Write in formal but warm Nigerian school English. Exactly 3–4 sentences. Do not start with "This student" — start with the student's first name.`;
+
+  async function generate() {
+    setLoading(true); setComment('');
+    const prompt = `Generate an end-of-term report card comment for:
+Name: ${student.name}
+Class: ${student.class}
+Term: ${student.term}
+Attendance: ${student.attendance}%
+Subject scores: ${student.subjects}`;
+    try {
+      const reply = await callClaude(SYSTEM,[{role:"user",content:prompt}]);
+      setComment(reply);
+    } catch(e) { setComment('Error: '+e.message); }
+    setLoading(false);
+  }
+
+  const DEMO_STUDENTS = [
+    {name:"Tunde Adeyemi",cls:"JSS 2",att:"95",subj:"English: 85, Maths: 92, Science: 88, Yoruba: 79, CRS: 76"},
+    {name:"Blessing Okafor",cls:"JSS 2",att:"72",subj:"English: 64, Maths: 55, Science: 70, Yoruba: 88, CRS: 81"},
+    {name:"Chisom Nwosu",cls:"JSS 2",att:"91",subj:"English: 78, Maths: 83, Science: 75, Yoruba: 65, CRS: 70"},
+  ];
+
+  async function generateBulk() {
+    setBulk(true); setBulkResults([]);
+    for (const s of DEMO_STUDENTS) {
+      const prompt = `Generate end-of-term report card comment. Name: ${s.name}, Class: ${s.cls}, Attendance: ${s.att}%, Scores: ${s.subj}`;
+      try {
+        const reply = await callClaude(SYSTEM,[{role:"user",content:prompt}]);
+        setBulkResults(p=>[...p,{name:s.name,comment:reply}]);
+      } catch(e) {
+        setBulkResults(p=>[...p,{name:s.name,comment:"Error: "+e.message}]);
+      }
+    }
+    setBulk(false);
+  }
+
+  const fields = [
+    {k:"name",l:"Student Name"},{k:"class",l:"Class"},
+    {k:"term",l:"Term"},{k:"attendance",l:"Attendance %"}
+  ];
+
+  return (
+    <div>
+      <AgentHeader emoji="📝" title="Report Card Narrative Agent"
+        sub="AI-generated end-of-term comments for every student"
+        gradient="linear-gradient(135deg,#15803D,#22C55E)"/>
+
+      <div style={{padding:16,background:"#F0FDF4",borderRadius:"0 0 10px 10px",
+        border:"1px solid #BBF7D0",borderTop:"none"}}>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+          {fields.map(f=>(
+            <div key={f.k}>
+              <Label>{f.l}</Label>
+              <Inp value={student[f.k]} onChange={v=>setStudent(p=>({...p,[f.k]:v}))} placeholder={f.l}/>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginBottom:14}}>
+          <Label>Subject Scores — format: English: 72, Maths: 58, Science: 81…</Label>
+          <Inp value={student.subjects} onChange={v=>setStudent(p=>({...p,subjects:v}))}
+            placeholder="English: 72, Maths: 58…" multiline rows={2}/>
+        </div>
+
+        <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+          <Btn onClick={generate} disabled={loading} color="#15803D">
+            {loading ? "Generating…" : "✍️ Generate Comment"}
+          </Btn>
+          <Btn onClick={generateBulk} disabled={bulk||loading} color="#15803D" outline>
+            {bulk ? `Generating ${bulkResults.length+1} of ${DEMO_STUDENTS.length}…` : "📋 Demo: Bulk 3 Students"}
+          </Btn>
+        </div>
+
+        {(loading||comment) && (
+          <div style={{marginTop:14,background:C.white,borderRadius:8,
+            padding:14,border:"1px solid #BBF7D0"}} className="fade-in">
+            <Label>Comment — {student.name}</Label>
+            {loading
+              ? <div style={{display:"flex",gap:8,alignItems:"center",color:C.mid,fontSize:13}}><Spinner/> Generating…</div>
+              : <div style={{fontSize:13,lineHeight:1.8,color:C.dark,fontFamily:"Georgia,serif",
+                  whiteSpace:"pre-wrap"}}>{comment}</div>
+            }
+            {comment && (
+              <div style={{marginTop:10,display:"flex",gap:8}}>
+                <Btn small color="#15803D" onClick={()=>navigator.clipboard.writeText(comment)}>📋 Copy</Btn>
+                <Btn small color="#15803D" outline onClick={()=>setComment('')}>Clear</Btn>
+              </div>
+            )}
+          </div>
+        )}
+
+        {bulkResults.length>0 && (
+          <div style={{marginTop:14,display:"flex",flexDirection:"column",gap:10}} className="fade-in">
+            <Label>Bulk Results — {bulkResults.length} of {DEMO_STUDENTS.length} comments</Label>
+            {bulkResults.map((r,i)=>(
+              <div key={i} style={{background:C.white,borderRadius:8,padding:12,border:"1px solid #BBF7D0"}}>
+                <div style={{fontSize:11,fontWeight:"bold",color:"#15803D",marginBottom:6,
+                  textTransform:"uppercase",letterSpacing:1}}>{r.name}</div>
+                <div style={{fontSize:12,lineHeight:1.75,color:C.dark,fontFamily:"Georgia,serif",
+                  whiteSpace:"pre-wrap"}}>{r.comment}</div>
+                <div style={{marginTop:8}}>
+                  <Btn small color="#15803D" onClick={()=>navigator.clipboard.writeText(r.comment)}>📋 Copy</Btn>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {bulk && bulkResults.length<DEMO_STUDENTS.length && (
+          <div style={{marginTop:10,color:C.mid,fontSize:12,display:"flex",gap:6,alignItems:"center"}}>
+            <Spinner/> Generating comment {bulkResults.length+1} of {DEMO_STUDENTS.length}…
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AGENT 4: PARENT COMMUNICATION AGENT
+// ══════════════════════════════════════════════════════════════════════════════
+function ParentCommsAgent() {
+  const [scenario, setScenario] = useState("fee_reminder");
+  const [details, setDetails] = useState({
+    school:"Bright Future Academy",parent:"Mrs. Adeyemi",
+    student:"Tunde Adeyemi",class:"JSS 2",
+    amount:"₦20,000",dueDate:"end of term",
+    absent_date:"today",collector:"Mr. James Adeyemi",
+    signout_time:"1:45pm",reason:"medical appointment"
+  });
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const SCENARIOS = [
+    {id:"fee_reminder",  label:"💰 Fee Reminder"},
+    {id:"absence_alert", label:"🔔 Absence Alert"},
+    {id:"collector_alert",label:"🚨 Unlisted Collector"},
+    {id:"signout_confirm",label:"🚪 Sign-Out Confirm"},
+    {id:"report_ready",  label:"📝 Report Card Ready"},
+  ];
+
+  const FIELDS = {
+    fee_reminder:    ["school","parent","student","class","amount","dueDate"],
+    absence_alert:   ["school","parent","student","class","absent_date"],
+    collector_alert: ["school","parent","student","class","collector"],
+    signout_confirm: ["school","parent","student","signout_time","collector","reason"],
+    report_ready:    ["school","parent","student","class"],
+  };
+
+  const LABELS = {
+    school:"School Name",parent:"Parent Name",student:"Student Name",
+    class:"Class",amount:"Amount Owed",dueDate:"Due Date",
+    absent_date:"Absent Date/Time",collector:"Collector Name",
+    signout_time:"Sign-Out Time",reason:"Reason"
+  };
+
+  const SYSTEM = `You are the EduBloom Parent Communication Agent for Nigerian private schools.
+Generate professional, warm WhatsApp messages from schools to parents.
+Messages: concise (under 80 words), warm but professional, clearly actionable, signed with the school name.
+Use Nigerian English conventions. Format for WhatsApp — no bullet points inside messages.`;
+
+  async function generate() {
+    setLoading(true); setMessage('');
+    const p = {
+      fee_reminder:`Write a WhatsApp fee reminder. School: ${details.school}, Parent: ${details.parent}, Student: ${details.student} (${details.class}), Amount: ${details.amount}, Due: ${details.dueDate}. Friendly but firm.`,
+      absence_alert:`Write a WhatsApp absence alert. School: ${details.school}, Parent: ${details.parent}, Student: ${details.student} (${details.class}) not marked present ${details.absent_date}. Ask parent to confirm. Urgent but calm.`,
+      collector_alert:`Write an URGENT WhatsApp alert. School: ${details.school}, Parent: ${details.parent}, Student: ${details.student}. Someone named "${details.collector}" arrived to collect the child but is NOT on the authorised list. Child has NOT been released. Parent must call school immediately.`,
+      signout_confirm:`Write a WhatsApp sign-out confirmation. School: ${details.school}, Parent: ${details.parent}, Student: ${details.student} signed out at ${details.signout_time} by ${details.collector}. Reason: ${details.reason}. Ask parent to confirm or call if not authorised.`,
+      report_ready:`Write a WhatsApp message telling parent their child's report card is ready. School: ${details.school}, Parent: ${details.parent}, Student: ${details.student} (${details.class}). Encourage them to collect from school.`,
+    };
+    try {
+      const reply = await callClaude(SYSTEM,[{role:"user",content:p[scenario]}]);
+      setMessage(reply);
+    } catch(e) { setMessage('Error: '+e.message); }
+    setLoading(false);
+  }
+
+  return (
+    <div>
+      <AgentHeader emoji="💬" title="Parent Communication Agent"
+        sub="AI-drafted WhatsApp messages for every scenario"
+        gradient="linear-gradient(135deg,#1D4ED8,#3B82F6)"/>
+
+      <div style={{padding:16,background:"#EFF6FF",borderRadius:"0 0 10px 10px",
+        border:"1px solid #BFDBFE",borderTop:"none"}}>
+
+        <div style={{marginBottom:14}}>
+          <Label>Scenario</Label>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+            {SCENARIOS.map(s=>(
+              <button key={s.id} onClick={()=>{setScenario(s.id);setMessage('');}} style={{
+                background:scenario===s.id?"#1D4ED8":C.white,
+                color:scenario===s.id?C.white:"#1D4ED8",
+                border:`1px solid ${scenario===s.id?"#1D4ED8":"#BFDBFE"}`,
+                borderRadius:20,padding:"5px 12px",fontSize:11,
+                cursor:"pointer",fontFamily:"Georgia,serif",fontWeight:"bold"
+              }}>{s.label}</button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+          {FIELDS[scenario].map(f=>(
+            <div key={f}>
+              <Label>{LABELS[f]}</Label>
+              <Inp value={details[f]} onChange={v=>setDetails(p=>({...p,[f]:v}))} placeholder={LABELS[f]}/>
+            </div>
+          ))}
+        </div>
+
+        <Btn onClick={generate} disabled={loading} color="#1D4ED8">
+          {loading ? "Drafting…" : "💬 Draft WhatsApp Message"}
+        </Btn>
+
+        {(loading||message) && (
+          <div style={{marginTop:14}} className="fade-in">
+            <Label>WhatsApp Preview</Label>
+            <div style={{background:"#E5DDD5",borderRadius:10,padding:12}}>
+              <div style={{background:"#DCF8C6",borderRadius:"4px 12px 12px 12px",
+                padding:"10px 14px",maxWidth:"85%",marginLeft:"auto",
+                boxShadow:"0 1px 2px rgba(0,0,0,0.08)"}}>
+                {loading
+                  ? <div style={{display:"flex",gap:8,alignItems:"center",color:C.mid,fontSize:13}}><Spinner/> Drafting…</div>
+                  : <div style={{fontSize:13,lineHeight:1.75,color:"#1A1A1A",
+                      fontFamily:"sans-serif",whiteSpace:"pre-wrap"}}>{message}</div>
+                }
+                {message && <div style={{fontSize:10,color:"#667781",marginTop:4,textAlign:"right"}}>✓✓</div>}
+              </div>
+            </div>
+            {message && (
+              <div style={{marginTop:8,display:"flex",gap:8}}>
+                <Btn small color="#1D4ED8" onClick={()=>navigator.clipboard.writeText(message)}>📋 Copy Message</Btn>
+                <Btn small color="#1D4ED8" outline onClick={()=>setMessage('')}>Clear</Btn>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{marginTop:12,padding:"8px 12px",background:"#FEF3C7",
+          borderRadius:8,border:"1px solid #FCD34D",fontSize:11,color:"#92400E"}}>
+          ⚡ <strong>Note:</strong> Automated sending requires WhatsApp Business API (pending approval).
+          Until then, copy the message and send manually via WhatsApp.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════════════════════════════
+function Settings({onReset}) {
+  const [newKey, setNewKey] = useState('');
+  const [saved, setSaved] = useState(false);
+  function update() {
+    if (!newKey.trim()) return;
+    localStorage.setItem('edubloom_ai_key', newKey.trim());
+    setSaved(true); setNewKey('');
+    setTimeout(()=>setSaved(false), 2500);
+  }
+  return (
+    <div>
+      <AgentHeader emoji="⚙️" title="Settings"
+        sub="API key and account configuration"
+        gradient="linear-gradient(135deg,#374151,#6B7280)"/>
+      <div style={{padding:16,background:"#F9FAFB",borderRadius:"0 0 10px 10px",
+        border:"1px solid #E5E7EB",borderTop:"none"}}>
+        <div style={{marginBottom:16}}>
+          <Label>Update Anthropic API Key</Label>
+          <Inp type="password" value={newKey} onChange={setNewKey} placeholder="sk-ant-api03-…"/>
+          <div style={{marginTop:8,display:"flex",gap:8,alignItems:"center"}}>
+            <Btn onClick={update} disabled={!newKey.trim()} color="#374151" small>Update Key</Btn>
+            {saved && <span style={{fontSize:12,color:C.green}}>✅ Key updated</span>}
+          </div>
+        </div>
+        <div style={{padding:"10px 14px",background:C.white,borderRadius:8,
+          border:"1px solid #E5E7EB",fontSize:12,color:C.mid,lineHeight:1.7,marginBottom:12}}>
+          <strong style={{color:C.dark}}>EduBloom AI Agent Suite</strong><br/>
+          Powered by Anthropic Claude Sonnet<br/>
+          AariNAT Company Limited · RC-1732521<br/>
+          +234 814 507 3941 · edubloom.com.ng
+        </div>
+        <Btn onClick={onReset} color={C.red} outline small>🔓 Remove API Key & Log Out</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MAIN APP
+// ══════════════════════════════════════════════════════════════════════════════
+const AGENTS = [
+  {id:"onboard", label:"Onboarding", icon:"🏫", component:OnboardingAgent},
+  {id:"finance",  label:"Finance",   icon:"📊", component:FinanceAdvisor},
+  {id:"reports",  label:"Reports",   icon:"📝", component:ReportCardAgent},
+  {id:"comms",    label:"Parent Comms",icon:"💬",component:ParentCommsAgent},
+  {id:"settings", label:"Settings",  icon:"⚙️", component:null},
+];
+
+function App() {
+  const [hasKey, setHasKey] = useState(!!localStorage.getItem('edubloom_ai_key'));
+  const [active, setActive] = useState("onboard");
+
+  if (!hasKey) return <ApiKeySetup onSave={()=>setHasKey(true)}/>;
+
+  const AgentComp = active==="settings" ? null : AGENTS.find(a=>a.id===active)?.component;
+
+  return (
+    <div style={{background:C.bg,minHeight:"100vh",fontFamily:"Georgia,serif",paddingBottom:40}}>
+      {/* Header */}
+      <div style={{background:`linear-gradient(135deg,${C.purple} 0%,${C.purpleMid} 100%)`,
+        padding:"18px 20px 0",color:C.white}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:4}}>
+          <div style={{fontSize:26,fontWeight:"bold"}}>
+            <span style={{color:C.white}}>Edu</span><span style={{color:C.gold}}>BLOOM</span>
+          </div>
+          <div style={{height:20,width:1,background:`${C.white}44`}}/>
+          <div style={{fontSize:12,color:"#DDD6FE"}}>AI Agent Suite</div>
+        </div>
+        <div style={{fontSize:11,color:"#C4B5FD",marginBottom:14}}>
+          4 AI agents · Powered by Anthropic · AariNAT Company Limited
+        </div>
+        <div style={{display:"flex",gap:3,overflowX:"auto",paddingBottom:2}}>
+          {AGENTS.map(a=>(
+            <button key={a.id} onClick={()=>setActive(a.id)} style={{
+              background:active===a.id?C.white:"transparent",
+              color:active===a.id?C.purple:"#DDD6FE",
+              border:"none",borderRadius:"8px 8px 0 0",
+              padding:"8px 14px",cursor:"pointer",
+              fontFamily:"Georgia,serif",fontSize:11,fontWeight:"bold",
+              whiteSpace:"nowrap",transition:"all 0.15s",flexShrink:0
+            }}>{a.icon} {a.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Agent Panel */}
+      <div style={{padding:"0 16px",marginTop:0}}>
+        <div style={{borderRadius:"0 0 12px 12px",overflow:"hidden",
+          boxShadow:"0 4px 24px rgba(75,0,130,0.10)"}}>
+          {active==="settings"
+            ? <Settings onReset={()=>{localStorage.removeItem('edubloom_ai_key');setHasKey(false);}}/>
+            : AgentComp && <AgentComp/>
+          }
+        </div>
+      </div>
+
+      {/* Status bar */}
+      <div style={{margin:"14px 16px 0",padding:"9px 14px",
+        background:C.white,borderRadius:8,border:`1px solid #E0D5F0`,
+        display:"flex",justifyContent:"space-between",alignItems:"center",
+        flexWrap:"wrap",gap:6}}>
+        {AGENTS.filter(a=>a.id!=="settings").map(a=>(
+          <div key={a.id} style={{display:"flex",alignItems:"center",gap:4}}>
+            <div style={{width:6,height:6,borderRadius:"50%",
+              background:active===a.id?"#4ADE80":"#D1D5DB"}}/>
+            <span style={{fontSize:10,color:active===a.id?C.dark:C.mid}}>{a.icon} {a.label}</span>
+          </div>
+        ))}
+        <div style={{fontSize:10,color:C.mid}}>edubloom.com.ng · 0814 507 3941</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
