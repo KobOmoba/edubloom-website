@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School Portal Guide — Educational Bloom</title>
+<style>
+  :root{--bg:#0f172a;--card:#161f36;--text:#f1f5f9;--sub:#94a3b8;--brand:#2563eb;--border:#233047;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.65;}
+  .wrap{max-width:720px;margin:0 auto;padding:1.5rem 1.1rem 4rem;}
+  a{color:#60a5fa;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  h1{font-size:1.5rem;margin-bottom:0.2rem;}
+  h2{font-size:1.1rem;color:#93c5fd;margin-top:2.2rem;border-bottom:1px solid var(--border);padding-bottom:0.4rem;display:flex;align-items:center;gap:0.5rem;}
+  p{font-size:0.92rem;color:#e2e8f0;}
+  .meta{color:var(--sub);font-size:0.82rem;margin-bottom:1.5rem;}
+  .back{display:inline-block;margin-bottom:1.2rem;font-size:0.85rem;color:var(--sub);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:1.1rem 0;}
+  .step{display:flex;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--border);}
+  .step:last-child{border-bottom:none;}
+  .step-num{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#7c3f2a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;}
+  .step-text{font-size:0.92rem;color:#e2e8f0;}
+  code{background:#0c1424;border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-family:'DM Mono',monospace;color:#93c5fd;font-size:0.85rem;}
+  .grid{display:grid;gap:0.8rem;margin-top:1rem;}
+  .item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;}
+  .item-title{font-weight:800;font-size:0.98rem;margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem;}
+  .item-desc{font-size:0.87rem;color:var(--sub);}
+  .tip{background:linear-gradient(135deg,#1e293b,#111827);border:1px solid #334155;border-radius:10px;padding:1rem 1.1rem;margin-top:1.5rem;}
+  .tip-title{font-weight:800;font-size:0.95rem;display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">← Educational Bloom</a>
+  <h1>📱 School Portal — How to Log In &amp; What Each Section Does</h1>
+  <div class="meta">A quick visual walkthrough of every part of the app.</div>
+
+  <h2>🔑 Logging In</h2>
+  <div class="card">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">Go to <code>school.edubloom.com.ng</code> in any browser (or open the installed app icon if you added it to your home screen).</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">Enter your <strong>School ID</strong> (e.g. <code>BLOOM-0101M</code>). This was given to you when your school was onboarded — check your welcome message or ask your AariNAT agent if you've lost it.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">Choose your role — <strong>Principal</strong> or <strong>Teacher</strong>. Principals get full admin access; Teachers get a scoped-down view for their own classes.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">If prompted for a password (Principal role), enter it to unlock full administrative access.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-text">You'll land on the <strong>Revenue</strong> dashboard — your home screen every time you log in.</div>
+    </div>
+  </div>
+
+  <h2>🧭 What Every Section Does</h2>
+  <div class="grid">
+    <div class="item">
+      <div class="item-title">💰 Revenue</div>
+      <div class="item-desc">Your money dashboard. Shows outstanding fees this term, total collected, and per-class breakdowns. This is the screen you land on after login — your daily "how are we doing" snapshot.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🎓 Students</div>
+      <div class="item-desc">The master student list. Add students one by one, import a whole class from a photo/CSV, edit records, assign classes, and search/filter by class or status.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">👥 Staff</div>
+      <div class="item-desc">Manage teacher and staff records — names, roles, contact info, and which classes/subjects each staff member is assigned to.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">⚽ Sports</div>
+      <div class="item-desc">Track sports activities, teams, and events for the school — inter-house sports, competitions, and participation records.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🎨 Arts</div>
+      <div class="item-desc">Manage arts &amp; craft activities, exhibitions, and creative program records for students.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🎵 Music</div>
+      <div class="item-desc">Track music programs, choir/band participation, and related school activities.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🏥 Health</div>
+      <div class="item-desc">Student health records — allergies, conditions, emergency contacts, and clinic visit logs.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🎓 Alumni</div>
+      <div class="item-desc">Keep a record of graduated students — where they went, achievements, and a way to stay connected with former students.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">📉 Expenses</div>
+      <div class="item-desc">Log school expenses — salaries, supplies, maintenance — so Revenue vs Expenses gives a true profit picture.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🤖 Finance AI</div>
+      <div class="item-desc">AI-powered financial insights — ask questions about your school's money in plain English and get analysis of income, spending trends, and fee collection patterns.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">📢 Comms</div>
+      <div class="item-desc">Send announcements and messages to parents/staff — including the automated 8:30am and 9:30am parent safety alerts.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">📊 Analytics</div>
+      <div class="item-desc">Deeper reporting — attendance trends, score performance across classes/terms, and other data visualizations beyond the Revenue snapshot.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🔍 Scout</div>
+      <div class="item-desc">Opportunity/lead scouting — surfaces nearby growth opportunities or prospects relevant to expanding the school's reach.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">📋 Scorecard</div>
+      <div class="item-desc">Where scores live — enter, scan (OCR), or review student CA/Exam scores by subject, class, and term. Feeds report cards.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">🔒 Security</div>
+      <div class="item-desc">Account &amp; data security settings — password management and access controls for the portal.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">⚙️ Settings</div>
+      <div class="item-desc">School profile, term/session settings, class list configuration, and general app preferences.</div>
+    </div>
+    <div class="item">
+      <div class="item-title">❓ Support</div>
+      <div class="item-desc">Your assigned AariNAT support contact, hotline, email, and FAQ answers — how to add students, generate report cards, fix sync issues, and more.</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-title">💡 Quick tip</div>
+    <p style="margin:0;">Tap the logo or school name at the top (or in the sidebar) from anywhere in the app to jump straight back to the Revenue dashboard.</p>
+  </div>
+
+  <p style="margin-top:2rem;font-size:0.85rem;color:var(--sub);">
+    Need more help? Message AariNAT support on WhatsApp:
+    <a href="https://wa.me/2348145073941?text=Hello%2C%20I%20need%20help%20with%20the%20EduBloom%20School%20Portal" target="_blank">+234 814 507 3941</a>
+  </p>
+</div>
+</body>
+</html>
