@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data & Compliance — Educational Bloom</title>
+<style>
+  :root{--bg:#0f172a;--card:#161f36;--text:#f1f5f9;--sub:#94a3b8;--border:#233047;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.65;}
+  .wrap{max-width:720px;margin:0 auto;padding:1.5rem 1.1rem 4rem;}
+  a{color:#60a5fa;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  h1{font-size:1.5rem;margin-bottom:0.2rem;}
+  h2{font-size:1.05rem;color:#93c5fd;margin-top:2rem;border-bottom:1px solid var(--border);padding-bottom:0.4rem;}
+  p,li{font-size:0.92rem;color:#e2e8f0;}
+  .meta{color:var(--sub);font-size:0.82rem;margin-bottom:1.5rem;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;margin:1rem 0;font-size:0.88rem;color:var(--sub);}
+  .back{display:inline-block;margin-bottom:1.2rem;font-size:0.85rem;color:var(--sub);}
+  ul{padding-left:1.2rem;}
+  strong{color:#fff;}
+  table{width:100%;border-collapse:collapse;font-size:0.85rem;margin:0.8rem 0;}
+  td,th{border:1px solid var(--border);padding:0.5rem 0.6rem;text-align:left;}
+  th{background:#1c2947;color:#cbd5e1;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./index.html">← Educational Bloom</a>
+  <h1>Data & Compliance</h1>
+  <div class="meta">Effective date: 5 July 2026 · AariNAT Company Limited (RC-1732521)</div>
+
+  <div class="card">
+    This page sets out, in more technical detail than our <a href="./privacy.html">Privacy Policy</a>, how AariNAT
+    complies with the <strong>Nigeria Data Protection Act, 2023 ("NDPA")</strong> across the Educational Bloom platform.
+    It is intended for school administrators, auditors, and regulators.
+  </div>
+
+  <h2>1. Regulatory Framework</h2>
+  <ul>
+    <li><strong>Law:</strong> Nigeria Data Protection Act, 2023</li>
+    <li><strong>Regulator:</strong> Nigeria Data Protection Commission (NDPC) — <a href="https://ndpc.gov.ng" target="_blank">ndpc.gov.ng</a></li>
+    <li><strong>Data Controller (platform-level):</strong> AariNAT Company Limited, RC-1732521</li>
+    <li><strong>Data Controller (student/staff-level):</strong> the individual subscribing school</li>
+    <li><strong>Data Processor:</strong> AariNAT Company Limited, processing on each school's instructions</li>
+  </ul>
+
+  <h2>2. NDPC Registration</h2>
+  <p>Organisations processing personal data of more than the NDPC's prescribed threshold of data subjects, or processing
+  certain categories of sensitive data, are required to register with the NDPC as a Data Controller or Processor of
+  major importance. AariNAT tracks its school and student count against this threshold and will complete NDPC
+  registration <strong>before scaling past its early-stage rollout</strong>, as reflected in our internal roadmap.</p>
+
+  <h2>3. Technical & Organisational Measures</h2>
+  <table>
+    <tr><th>Area</th><th>Measure</th></tr>
+    <tr><td>Infrastructure</td><td>Google Firebase (Firestore) — encrypted in transit (TLS) and at rest by the provider</td></tr>
+    <tr><td>Access control</td><td>Role-based access in the School Portal (Principal / Bursar / Class Teacher / Subject Teacher); fee data hidden from teaching staff</td></tr>
+    <tr><td>Admin access</td><td>Command Center restricted by admin password; only AariNAT staff hold this</td></tr>
+    <tr><td>Offline caching</td><td>Data cached locally on-device for offline use; cleared on logout</td></tr>
+    <tr><td>Payment data</td><td>Processed by licensed processor (Kora/Korapay); AariNAT does not store card or bank credentials</td></tr>
+    <tr><td>Backups</td><td>Firestore's built-in redundancy; admin-level manual export available on request</td></tr>
+  </table>
+
+  <h2>4. Categories of Personal Data Processed</h2>
+  <ul>
+    <li><strong>Ordinary personal data:</strong> names, phone numbers, emails, class/role, attendance, academic scores, fee balances.</li>
+    <li><strong>Sensitive personal data:</strong> we do not intentionally collect health, biometric, or genetic data. Any
+    health-related notes a school chooses to enter (e.g. allergy notes in the Health module) are entered and controlled
+    solely by the school, and schools are responsible for the lawful basis for capturing that information.</li>
+  </ul>
+
+  <h2>5. Children's Data — Special Note</h2>
+  <p>Most data subjects in the Student module are minors. In line with NDPA requirements around children's data:</p>
+  <ul>
+    <li>Schools (not AariNAT) collect student data directly from parents/guardians as part of enrolment and are
+    responsible for parental/guardian consent or another valid lawful basis;</li>
+    <li>AariNAT does not use student data for advertising, profiling, or any purpose beyond providing the school
+    management service instructed by the school;</li>
+    <li>WhatsApp messages to parents (fee reminders, absence alerts) are triggered by the school, using contact details
+    the school itself has collected.</li>
+  </ul>
+
+  <h2>6. Cross-Border Data Transfer</h2>
+  <p>Data is hosted on Google Firebase, which may process data on servers outside Nigeria. The NDPA permits
+  cross-border transfer where the recipient country/organisation provides an adequate level of protection, or where
+  appropriate safeguards (such as standard contractual clauses) are in place. Google maintains globally recognised
+  security and privacy certifications and standard data-processing terms that we rely on to meet this requirement.
+  We continue to monitor NDPC guidance on approved transfer mechanisms as the regulatory framework matures.</p>
+
+  <h2>7. Data Retention & Deletion</h2>
+  <p>Active-subscription data is retained for the life of the subscription. Following termination, data is retained for
+  <strong>24 months</strong> for account-recovery and record-keeping purposes, after which it is deleted or anonymised.
+  Schools or individuals may request earlier deletion, subject to any legal retention obligation.</p>
+
+  <h2>8. Data Breach Response</h2>
+  <p>In the event of a data breach involving personal data likely to result in risk to affected individuals, AariNAT
+  will notify the NDPC within the timeframe required by the NDPA and inform affected schools without undue delay, so
+  schools can in turn notify affected parents/guardians as appropriate.</p>
+
+  <h2>9. Data Protection Impact & Accountability</h2>
+  <p>As AariNAT scales (per our staged rollout plan), we will conduct data protection impact assessments for new
+  features that materially increase data-processing risk (e.g. biometric attendance, expanded payment integrations)
+  before launch.</p>
+
+  <h2>10. Contact for Compliance Queries</h2>
+  <p>Email: <a href="mailto:aarinat.company.limited@gmail.com">aarinat.company.limited@gmail.com</a><br>
+  Phone/WhatsApp: +234 814 507 3941<br>
+  NDPC: <a href="https://ndpc.gov.ng" target="_blank">ndpc.gov.ng</a></p>
+</div>
+</body>
+</html>
