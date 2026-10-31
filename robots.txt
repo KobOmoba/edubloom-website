@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://edubloom.com.ng/sitemap.xml
